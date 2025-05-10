@@ -17,6 +17,18 @@ public class Seat {
     private String seatType;
     private boolean isBooked = false;
 
+    public Seat(Long id, String seatNumber, String seatType, boolean isBooked, TheaterRoom theaterRoom) {
+        this.id = id;
+        this.seatNumber = seatNumber;
+        this.seatType = seatType;
+        this.isBooked = isBooked;
+        this.theaterRoom = theaterRoom;
+    }
+
+    public Seat() {
+
+    }
+
     public Long getId() {
         return id;
     }

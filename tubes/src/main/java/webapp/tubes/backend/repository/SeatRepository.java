@@ -7,7 +7,7 @@ import webapp.tubes.backend.entity.TheaterRoom;
 import java.util.List;
 
 public interface SeatRepository extends JpaRepository<Seat, Long> {
-    List<Seat> findByTheaterRoomAndisBookedFalse(TheaterRoom room);
+    List<Seat> findByTheaterRoomAndIsBookedFalse(TheaterRoom room);
     List<Seat> findByTheaterRoom(TheaterRoom room);
 
 }
