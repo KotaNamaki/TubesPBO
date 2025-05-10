@@ -5,14 +5,13 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import webapp.tubes.backend.entity.Seat;
 import webapp.tubes.backend.entity.TheaterRoom;
@@ -20,28 +19,42 @@ import webapp.tubes.backend.repository.SeatRepository;
 import webapp.tubes.backend.repository.TheaterRoomRepository;
 
 @Route("seats")
+@PageTitle("Tempat Duduk")
 public class SeatManagementView extends VerticalLayout {
-
     private final TheaterRoomRepository theaterRoomRepository;
     private final SeatRepository seatRepository;
-    private ComboBox<TheaterRoom> roomComboBox = new ComboBox<>("Select Theater Room");
-    private Grid<Seat> seatGrid = new Grid<>(Seat.class);
+    private final ComboBox<TheaterRoom> roomComboBox;
+    private final Grid<Seat> seatGrid;
 
     public SeatManagementView(TheaterRoomRepository theaterRoomRepository, SeatRepository seatRepository) {
         this.theaterRoomRepository = theaterRoomRepository;
         this.seatRepository = seatRepository;
+        this.roomComboBox = new ComboBox<>("Select Theater Room");
+        this.seatGrid = new Grid<>(Seat.class);
 
+        setupLayout();
+    }
+
+    private void setupLayout() {
         setSizeFull();
-        add(new H1("Seat Management"));
-
+        
         configureRoomComboBox();
         configureSeatGrid();
+        
+        HorizontalLayout buttonLayout = createButtonLayout();
+        
+        add(
+            new H1("Tempat Duduk"),
+            roomComboBox,
+            buttonLayout,
+            seatGrid
+        );
+    }
 
-        Button addRoomButton = new Button("Add New Room", e -> showRoomDialog());
-        Button generateSeatsButton = new Button("Generate Seats", e -> showGenerateSeatsDialog());
-
-        HorizontalLayout buttonLayout = new HorizontalLayout(addRoomButton, generateSeatsButton);
-        add(roomComboBox, buttonLayout, seatGrid);
+    private HorizontalLayout createButtonLayout() {
+        Button addRoomButton = new Button("Tambah Ruang", e -> showRoomDialog());
+        Button generateSeatsButton = new Button("Tambah tempat duduk", e -> showGenerateSeatsDialog());
+        return new HorizontalLayout(addRoomButton, generateSeatsButton);
     }
 
     private void configureRoomComboBox() {
@@ -53,18 +66,23 @@ public class SeatManagementView extends VerticalLayout {
     private void configureSeatGrid() {
         seatGrid.removeAllColumns();
         seatGrid.addColumn(Seat::getSeatNumber).setHeader("Seat Number");
-        seatGrid.addColumn(seat -> seat.getType().toString()).setHeader("Type");
+        seatGrid.addColumn(Seat::getSeatType).setHeader("Type");
         seatGrid.addColumn(Seat::isBooked).setHeader("Booked");
+        addBookingColumn();
+    }
 
+    private void addBookingColumn() {
         seatGrid.addComponentColumn(seat -> {
             Button toggleButton = new Button(seat.isBooked() ? "Release" : "Book");
-            toggleButton.addClickListener(e -> {
-                seat.setBooked(!seat.isBooked());
-                seatRepository.save(seat);
-                updateSeatGrid();
-            });
+            toggleButton.addClickListener(e -> toggleSeatBooking(seat));
             return toggleButton;
         });
+    }
+
+    private void toggleSeatBooking(Seat seat) {
+        seat.setBooked(!seat.isBooked());
+        seatRepository.save(seat);
+        updateSeatGrid();
     }
 
     private void updateSeatGrid() {
@@ -77,8 +95,19 @@ public class SeatManagementView extends VerticalLayout {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Room Name");
         IntegerField capacityField = new IntegerField("Capacity");
+        Button saveButton = createSaveRoomButton(dialog, nameField, capacityField);
 
-        Button saveButton = new Button("Save", e -> {
+        dialog.add(new VerticalLayout(
+            new H3("Add New Theater Room"),
+            nameField,
+            capacityField,
+            saveButton
+        ));
+        dialog.open();
+    }
+
+    private Button createSaveRoomButton(Dialog dialog, TextField nameField, IntegerField capacityField) {
+        return new Button("Save", e -> {
             TheaterRoom room = new TheaterRoom();
             room.setName(nameField.getValue());
             room.setCapacity(capacityField.getValue());
@@ -86,14 +115,6 @@ public class SeatManagementView extends VerticalLayout {
             roomComboBox.setItems(theaterRoomRepository.findAll());
             dialog.close();
         });
-
-        dialog.add(new VerticalLayout(
-                new H3("Add New Theater Room"),
-                nameField,
-                capacityField,
-                saveButton
-        ));
-        dialog.open();
     }
 
     private void showGenerateSeatsDialog() {
@@ -102,54 +123,61 @@ public class SeatManagementView extends VerticalLayout {
             return;
         }
 
+        Dialog dialog = createGenerateSeatsDialog();
+        dialog.open();
+    }
+
+    private Dialog createGenerateSeatsDialog() {
         Dialog dialog = new Dialog();
         IntegerField rowsField = new IntegerField("Number of Rows");
         IntegerField seatsPerRowField = new IntegerField("Seats per Row");
-        ComboBox<Seat.SeatType> typeComboBox = new ComboBox<>("Default Seat Type");
-        typeComboBox.setItems(Seat.SeatType.values());
-
-        Button generateButton = new Button("Generate", e -> {
-            // Validate all required fields
-            if (rowsField.getValue() == null || seatsPerRowField.getValue() == null || typeComboBox.getValue() == null) {
-                Notification.show("Please fill in all fields");
-                return;
-            }
-            
-            if (rowsField.getValue() <= 0 || seatsPerRowField.getValue() <= 0) {
-                Notification.show("Number of rows and seats must be positive");
-                return;
-            }
-            
-            TheaterRoom room = roomComboBox.getValue();
-            seatRepository.deleteAll(seatRepository.findByTheaterRoom(room));
-
-            int rows = rowsField.getValue();
-            int seatsPerRow = seatsPerRowField.getValue();
-            Seat.SeatType defaultType = typeComboBox.getValue();
-
-            for (int row = 0; row < rows; row++) {
-                char rowChar = (char) ('A' + row);
-                for (int seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
-                    Seat seat = new Seat();
-                    seat.setSeatNumber(rowChar + String.valueOf(seatNum));
-                    seat.setType(defaultType);
-                    seat.setTheaterRoom(room);
-                    seatRepository.save(seat);
-                }
-            }
-
-            updateSeatGrid();
-            dialog.close();
-            Notification.show("Generated " + (rows * seatsPerRow) + " seats");
-        });
+        ComboBox<Seat.SeatType> typeComboBox = createSeatTypeComboBox();
+        Button generateButton = createGenerateButton(dialog, rowsField, seatsPerRowField, typeComboBox);
 
         dialog.add(new VerticalLayout(
-                new H3("Generate Seats for " + roomComboBox.getValue().getName()),
-                rowsField,
-                seatsPerRowField,
-                typeComboBox,
-                generateButton
+            new H3("Generate Seats for " + roomComboBox.getValue().getName()),
+            rowsField,
+            seatsPerRowField,
+            typeComboBox,
+            generateButton
         ));
-        dialog.open();
+        return dialog;
+    }
+
+    private ComboBox<Seat.SeatType> createSeatTypeComboBox() {
+        ComboBox<Seat.SeatType> typeComboBox = new ComboBox<>("Default Seat Type");
+        typeComboBox.setItems(Seat.SeatType.values());
+        return typeComboBox;
+    }
+
+    private Button createGenerateButton(Dialog dialog, IntegerField rowsField, 
+            IntegerField seatsPerRowField, ComboBox<Seat.SeatType> typeComboBox) {
+        return new Button("Generate", e -> {
+            generateSeats(rowsField.getValue(), seatsPerRowField.getValue(), typeComboBox.getValue());
+            dialog.close();
+        });
+    }
+
+    private void generateSeats(int rows, int seatsPerRow, Seat.SeatType defaultType) {
+        TheaterRoom room = roomComboBox.getValue();
+        seatRepository.deleteAll(seatRepository.findByTheaterRoom(room));
+
+        for (int row = 0; row < rows; row++) {
+            char rowChar = (char) ('A' + row);
+            for (int seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
+                createSeat(room, rowChar, seatNum, defaultType);
+            }
+        }
+
+        updateSeatGrid();
+        Notification.show("Generated " + (rows * seatsPerRow) + " seats");
+    }
+
+    private void createSeat(TheaterRoom room, char rowChar, int seatNum, Seat.SeatType defaultType) {
+        Seat seat = new Seat();
+        seat.setSeatNumber(rowChar + String.valueOf(seatNum));
+        seat.setSeatType(defaultType.toString());
+        seat.setTheaterRoom(room);
+        seatRepository.save(seat);
     }
 }

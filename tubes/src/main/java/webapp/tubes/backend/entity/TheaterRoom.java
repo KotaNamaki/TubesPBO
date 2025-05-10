@@ -13,6 +13,10 @@ public class TheaterRoom {
     private String name;
     private int capacity;
 
+    public TheaterRoom() {
+        
+    }
+
     public Long getId() {
         return id;
     }
@@ -27,6 +31,13 @@ public class TheaterRoom {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public TheaterRoom(Long id, String name, int capacity, List<Seat> seats) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.seats = seats;
     }
 
     public int getCapacity() {

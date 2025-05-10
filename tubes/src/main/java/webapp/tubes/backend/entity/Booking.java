@@ -24,6 +24,19 @@ public class Booking {
     private LocalDateTime bookingTime;
     private double totalPrice;
 
+    public Booking(Long id, Person person, Movie movie, LocalDateTime bookingTime, double totalPrice, List<Seat> seats) {
+        this.id = id;
+        this.person = person;
+        this.movie = movie;
+        this.bookingTime = bookingTime;
+        this.totalPrice = totalPrice;
+        this.seats = seats;
+    }
+
+    public Booking() {
+        
+    }
+
     public Long getId() {
         return id;
     }
