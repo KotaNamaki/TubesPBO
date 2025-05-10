@@ -36,6 +36,15 @@ public class SeatManagementView extends VerticalLayout {
     }
 
     private void title() {
+        title.addClassName("title");
+        subtitle.addClassName("subtitle");
+        title.setText("Seat Management");
+        subtitle.setText("Page ini digunakan untuk menambah atau menghapus seat pada ruang theater");
+        add(title);
+        add(subtitle);
+        sideways.setWidth("100%");
+        sideways.setAlignItems(Alignment.BASELINE);
+        sideways.add(roomComboBox);
 
 
     }
