@@ -9,7 +9,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import org.springframework.dao.DataIntegrityViolationException;
 import webapp.tubes.backend.entity.Movie;
 import webapp.tubes.backend.repository.MovieRepository;
 
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Route("movie")
-public class MainMovie extends VerticalLayout {
+public class Film extends VerticalLayout {
     private final MovieRepository movieRepository;
     private final Grid<Movie> grid = new Grid<>(Movie.class);
     private final TextField title = new TextField("Movie Title");
@@ -27,7 +26,7 @@ public class MainMovie extends VerticalLayout {
     private final TextField genre = new TextField("Genre");
     private final TextField searchField = new TextField();
 
-    public MainMovie(MovieRepository movieRepository) {
+    public Film(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
         configureSearch();
         configureGrid();
@@ -40,9 +39,14 @@ public class MainMovie extends VerticalLayout {
     private void configureSearch() {
         searchField.setPlaceholder("Cari film");
         searchField.setWidth("50%");
-        searchField.addValueChangeListener(e ->
-                grid.setItems(movieRepository.findByTitleContainingIgnoreCase(e.getValue()))
-        );
+        searchField.addValueChangeListener(e -> {
+            String searchTerm = searchField.getValue();
+            if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                updateGrid();
+            } else {
+                grid.setItems(movieRepository.findByTitleContainingIgnoreCase(e.getValue()));
+            }
+        });
     }
 
     private void configureGrid() {
@@ -112,7 +116,7 @@ public class MainMovie extends VerticalLayout {
                 return;
             }
 
-            // Additional validation for show time
+            // Additional validation for showtime
             if (timeShow.getValue().isBefore(LocalDateTime.now())) {
                 Notification.show("Waktu tayang harus di masa depan", 3000, Notification.Position.MIDDLE);
                 return;

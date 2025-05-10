@@ -12,7 +12,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import webapp.tubes.ui.layout.MainLayout;
 @Route(value = "", layout = MainLayout.class)
 @CssImport("./styles/style-shared.css")
 @PageTitle("Admin Page")
-public class MainView extends VerticalLayout {
+public class Pelanggan extends VerticalLayout {
     private final PersonRepository repository;
     HorizontalLayout sideways = new HorizontalLayout();
     VerticalLayout Vertical = new VerticalLayout();
@@ -42,7 +41,7 @@ public class MainView extends VerticalLayout {
     //Essentials
 
     @Autowired
-    public MainView(PersonRepository repository) {
+    public Pelanggan(PersonRepository repository) {
         this.repository = repository;
 
         setSizeFull();
@@ -156,8 +155,8 @@ public class MainView extends VerticalLayout {
     private void createTitle(){
         title.addClassName("title");
         subtitle.addClassName("subtitle");
-        title.setText("ADMIN PAGE");
-        subtitle.setText("Page ini digunakan untuk menambah data atau menghapus data");
+        title.setText("Pelanggan");
+        subtitle.setText("Page ini digunakan untuk menambah data atau menghapus data pelanggan");
         add(title);
         add(subtitle);
     }
