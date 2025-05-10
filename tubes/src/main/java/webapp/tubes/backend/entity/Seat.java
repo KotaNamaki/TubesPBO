@@ -14,10 +14,17 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String seatNumber;
-    private String seatType;
+
+    @Enumerated(EnumType.STRING)  // This stores the enum as a string in the database
+    private SeatType seatType;
+
     private boolean isBooked = false;
 
-    public Seat(Long id, String seatNumber, String seatType, boolean isBooked, TheaterRoom theaterRoom) {
+    @ManyToOne
+    @JoinColumn(name = "theater_room_id")
+    private TheaterRoom theaterRoom;
+
+    public Seat(Long id, String seatNumber, SeatType seatType, boolean isBooked, TheaterRoom theaterRoom) {
         this.id = id;
         this.seatNumber = seatNumber;
         this.seatType = seatType;
@@ -45,11 +52,11 @@ public class Seat {
         this.seatNumber = seatNumber;
     }
 
-    public String getSeatType() {
+    public SeatType getSeatType() {
         return seatType;
     }
 
-    public void setSeatType(String seatType) {
+    public void setSeatType(SeatType seatType) {
         this.seatType = seatType;
     }
 
@@ -69,9 +76,7 @@ public class Seat {
         this.theaterRoom = theaterRoom;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "theater_room_id")
-    private TheaterRoom theaterRoom;
+
 
     public enum SeatType { REGULAR, VIP, HANDICAP }
 

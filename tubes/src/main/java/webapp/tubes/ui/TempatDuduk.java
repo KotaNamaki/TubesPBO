@@ -17,16 +17,17 @@ import webapp.tubes.backend.entity.Seat;
 import webapp.tubes.backend.entity.TheaterRoom;
 import webapp.tubes.backend.repository.SeatRepository;
 import webapp.tubes.backend.repository.TheaterRoomRepository;
+import webapp.tubes.ui.layout.MainLayout;
 
-@Route("seats")
+@Route(value = "seats", layout = MainLayout.class)
 @PageTitle("Tempat Duduk")
-public class SeatManagementView extends VerticalLayout {
+public class TempatDuduk extends VerticalLayout {
     private final TheaterRoomRepository theaterRoomRepository;
     private final SeatRepository seatRepository;
     private final ComboBox<TheaterRoom> roomComboBox;
     private final Grid<Seat> seatGrid;
 
-    public SeatManagementView(TheaterRoomRepository theaterRoomRepository, SeatRepository seatRepository) {
+    public TempatDuduk(TheaterRoomRepository theaterRoomRepository, SeatRepository seatRepository) {
         this.theaterRoomRepository = theaterRoomRepository;
         this.seatRepository = seatRepository;
         this.roomComboBox = new ComboBox<>("Select Theater Room");
@@ -176,7 +177,7 @@ public class SeatManagementView extends VerticalLayout {
     private void createSeat(TheaterRoom room, char rowChar, int seatNum, Seat.SeatType defaultType) {
         Seat seat = new Seat();
         seat.setSeatNumber(rowChar + String.valueOf(seatNum));
-        seat.setSeatType(defaultType.toString());
+        seat.setSeatType(Seat.SeatType.valueOf(defaultType.name()));
         seat.setTheaterRoom(room);
         seatRepository.save(seat);
     }

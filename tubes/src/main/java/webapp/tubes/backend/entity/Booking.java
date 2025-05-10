@@ -34,7 +34,7 @@ public class Booking {
     }
 
     public Booking() {
-        
+
     }
 
     public Long getId() {
@@ -85,11 +85,10 @@ public class Booking {
         this.seats = seats;
     }
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)  // Change from default LAZY to EAGER
     @JoinTable(
-            name = "bookingSeat",
+            name = "booking_seat",
             joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "seat_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "seat_id"))
     private List<Seat> seats;
 }

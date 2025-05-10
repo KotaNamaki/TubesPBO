@@ -11,11 +11,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import webapp.tubes.backend.entity.Movie;
 import webapp.tubes.backend.repository.MovieRepository;
+import webapp.tubes.ui.layout.MainLayout;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Route("movie")
+@Route(value = "movie", layout = MainLayout.class)
 public class Film extends VerticalLayout {
     private final MovieRepository movieRepository;
     private final Grid<Movie> grid = new Grid<>(Movie.class);

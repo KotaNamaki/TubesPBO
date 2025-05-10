@@ -10,9 +10,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-import webapp.tubes.ui.Film;
-import webapp.tubes.ui.Pelanggan;
-import webapp.tubes.ui.SeatManagementView;
+import webapp.tubes.ui.*;
 
 @Route("app-layout")
 @Layout
@@ -32,7 +30,9 @@ public class MainLayout extends AppLayout {
         Tabs tabs = new Tabs(
                 new Tab(new RouterLink("Pelanggan", Pelanggan.class)),
                 new Tab(new RouterLink("Film", Film.class)),
-                new Tab(new RouterLink("Seat Management", SeatManagementView.class))
+                new Tab(new RouterLink("Seat Management", TempatDuduk.class)),
+                new Tab(new RouterLink("Ticket Booking", BookingTiket.class)),
+                new Tab(new RouterLink("Booking List", BookingList.class))
         );
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
 

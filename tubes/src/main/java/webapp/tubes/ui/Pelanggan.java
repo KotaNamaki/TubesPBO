@@ -19,7 +19,7 @@ import webapp.tubes.backend.entity.Person;
 import webapp.tubes.backend.repository.PersonRepository;
 import webapp.tubes.ui.layout.MainLayout;
 
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "Pelanggan", layout = MainLayout.class)
 @CssImport("./styles/style-shared.css")
 @PageTitle("Admin Page")
 public class Pelanggan extends VerticalLayout {
