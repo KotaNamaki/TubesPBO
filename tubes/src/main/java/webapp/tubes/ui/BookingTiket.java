@@ -51,6 +51,56 @@ public class BookingTiket extends VerticalLayout {
         setupEventListeners();
     }
 
+    private void setupLayout() {
+        setSizeFull();
+        setPadding(true);
+        setSpacing(true);
+
+        HorizontalLayout selectionLayout = new HorizontalLayout(personComboBox, movieComboBox, theaterRoomComboBox);
+        HorizontalLayout buttonLayout = new HorizontalLayout(totalSpan, bookButton);
+        selectionLayout.setSpacing(true);
+        buttonLayout.setSpacing(true);
+
+        add(
+            new H1("Pembelian Tiket Film"),
+            selectionLayout,
+            availableSeatsGrid,
+            buttonLayout
+        );
+    }
+
+    private void configureComponents() {
+        configureComboBoxes();
+        configureGrid();
+        bookButton.setThemeName("primary");
+    }
+
+    private void configureComboBoxes() {
+        // Person ComboBox
+        personComboBox.setItems(personRepository.findAll());
+        personComboBox.setItemLabelGenerator(p -> p.getName() + " (" + p.getEmail() + ")");
+        personComboBox.setWidthFull();
+
+        // Movie ComboBox
+        movieComboBox.setItems(movieRepository.findAll());
+        movieComboBox.setItemLabelGenerator(Movie::getTitle);
+        movieComboBox.setWidthFull();
+
+        // Theater Room ComboBox
+        theaterRoomComboBox.setItems(theaterRoomRepository.findAll());
+        theaterRoomComboBox.setItemLabelGenerator(TheaterRoom::getName);
+        theaterRoomComboBox.setWidthFull();
+    }
+
+    private void configureGrid() {
+        availableSeatsGrid.removeAllColumns();
+        availableSeatsGrid.addColumn(Seat::getSeatNumber).setHeader("Tempat Duduk").setAutoWidth(true);
+        availableSeatsGrid.addColumn(seat -> seat.getSeatType().toString()).setHeader("Tipe").setAutoWidth(true);
+        availableSeatsGrid.addColumn(this::formatSeatPrice).setHeader("Harga").setAutoWidth(true);
+        availableSeatsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
+        availableSeatsGrid.setWidthFull();
+    }
+
     private void setupEventListeners() {
         theaterRoomComboBox.addValueChangeListener(e -> updateAvailableSeats());
         availabeSeatsGrid.asMultiSelect().addValueChangeListener(e ->{
