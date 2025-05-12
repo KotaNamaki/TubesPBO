@@ -48,7 +48,7 @@ public class BookingList extends VerticalLayout {
         ).setHeader("Waktu Tayang");
 
         grid.addColumn(booking ->
-                String.format("$%.2f", booking.getTotalPrice())
+                String.format("Rp%.2f", booking.getTotalPrice())
         ).setHeader("Total");
 
         grid.addColumn(booking ->
